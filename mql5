@@ -1,0 +1,79 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                                     Gold Stuff AI |
+//|                                     https://www.forexroboteasy.com |
+//|                                          Developed by Forex Robot Easy Team |
+//+------------------------------------------------------------------+
+
+// Indicator inputs
+input string TrendIndicatorName = 'Moving Average';
+input int TrendPeriod = 20;
+input ENUM_APPLIED_PRICE AppliedPrice = PRICE_CLOSE;
+
+// Global variables
+int newsCheckPeriod = 300; // Check for news every 5 minutes
+datetime lastNewsCheckTime = 0; // Last time news was checked
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Initialize the trend indicator
+    int trendIndicatorHandle = iCustom(_Symbol, 0, TrendIndicatorName, TrendPeriod, AppliedPrice);
+    
+    // Check if the trend indicator is loaded successfully
+    if(trendIndicatorHandle == INVALID_HANDLE)
+    {
+        Print('Failed to load the trend indicator!');
+        return INIT_FAILED;
+    }
+    
+    // Enable the 'Allow WebRequest' option
+    if(!WebRequestSetAllowed(true))
+    {
+        Print('Failed to enable the 'Allow WebRequest' option!');
+        return INIT_FAILED;
+    }
+    
+    return INIT_SUCCEEDED;
+}
+
+//+------------------------------------------------------------------+
+//| Expert tick function                                             |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+    // Check if it's time to fetch news
+    if(TimeCurrent() - lastNewsCheckTime >= newsCheckPeriod)
+    {
+        // Fetch news from 'ec.forexprostools.com'
+        string newsURL1 = 'https://ec.forexprostools.com';
+        string newsData1 = WebRequest(newsURL1, NULL, NULL, NULL, 5000);
+        
+        // Fetch news from 'worldtimeserver.com'
+        string newsURL2 = 'https://worldtimeserver.com';
+        string newsData2 = WebRequest(newsURL2, NULL, NULL, NULL, 5000);
+        
+        // Process the fetched news data (e.g., display or analyze)
+        ProcessNewsData(newsData1);
+        ProcessNewsData(newsData2);
+        
+        // Update the last news check time
+        lastNewsCheckTime = TimeCurrent();
+    }
+    
+    // Implement your trading strategy here
+    // ...
+}
+
+//+------------------------------------------------------------------+
+//| Process fetched news data                                         |
+//+------------------------------------------------------------------+
+void ProcessNewsData(string newsData)
+{
+    // Process the news data (e.g., display or analyze)
+    // ...
+}
+
+//+------------------------------------------------------------------+
